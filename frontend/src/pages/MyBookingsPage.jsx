@@ -4,7 +4,7 @@ import { api } from '../services/api';
 import { Toast } from '../components/Toast';
 
 export function MyBookingsPage() {
-  const { user, updateWalletBalance } = useAuth();
+  const { user } = useAuth();
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,9 +71,6 @@ export function MyBookingsPage() {
       const res = await api.bookings.cancel(cancellingPNR);
       if (res.success) {
         setToast({ type: 'success', message: res.message });
-        if (res.refundAmount && user) {
-          updateWalletBalance((Number(user.wallet_balance) || 0) + Number(res.refundAmount));
-        }
         setCancellingPNR(null);
         loadBookings();
       } else {
@@ -431,7 +428,7 @@ export function MyBookingsPage() {
             <h3 style={{ margin: '0 0 8px 0', color: '#1c2430' }}>Cancel Ticket Confirmation</h3>
             <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>
               Are you sure you want to cancel ticket for PNR: <strong style={{ color: '#008cff' }}>{cancellingPNR}</strong>?
-              The ticket fare will be automatically refunded back to your SafarSathi wallet.
+              Your reserved seat(s) will be released immediately.
             </p>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button

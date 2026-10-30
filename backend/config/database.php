@@ -63,6 +63,7 @@ function getDB() {
         if ($needsInit) {
             initSqliteDatabase($pdo);
         }
+        ensureSchemaUpgrades($pdo);
         return $pdo;
     }
 
@@ -76,6 +77,7 @@ function getDB() {
         ];
         $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         autoInitDatabase($pdo);
+        ensureSchemaUpgrades($pdo);
         return $pdo;
     } catch (PDOException $e) {
         // If database doesn't exist, try creating it
@@ -91,8 +93,7 @@ function getDB() {
                 autoInitDatabase($pdo);
                 return $pdo;
             } catch (Exception $ex) {
-                // If MySQL completely fails locally, fallback to SQLite if in development
-                if (getenv('APP_ENV') === 'development' || !getenv('APP_ENV')) {
+                if (isLocalEnvironment()) {
                     return fallbackToSqlite();
                 }
                 http_response_code(500);
@@ -105,7 +106,7 @@ function getDB() {
         }
 
         // Connection refused or server down
-        if (getenv('APP_ENV') === 'development' || !getenv('APP_ENV')) {
+        if (isLocalEnvironment()) {
             return fallbackToSqlite();
         }
 
@@ -116,6 +117,20 @@ function getDB() {
         ]);
         exit;
     }
+}
+
+function isLocalEnvironment() {
+    if (getenv('APP_ENV') === 'development' || !getenv('APP_ENV')) {
+        return true;
+    }
+    if (PHP_SAPI === 'cli' || PHP_SAPI === 'cli-server') {
+        return true;
+    }
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -134,7 +149,30 @@ function fallbackToSqlite() {
     if ($isNew) {
         initSqliteDatabase($sqlitePdo);
     }
+    ensureSchemaUpgrades($sqlitePdo);
     return $sqlitePdo;
+}
+
+/**
+ * Self-healing schema migration for Conductor & Distance columns
+ */
+function ensureSchemaUpgrades($pdo) {
+    $alterStatements = [
+        "ALTER TABLE buses ADD COLUMN conductor_name VARCHAR(255) DEFAULT NULL",
+        "ALTER TABLE buses ADD COLUMN conductor_phone VARCHAR(50) DEFAULT NULL",
+        "ALTER TABLE buses ADD COLUMN conductor_pin VARCHAR(50) DEFAULT '1234'",
+        "ALTER TABLE buses ADD COLUMN distance VARCHAR(100) DEFAULT NULL",
+        "ALTER TABLE buses ADD COLUMN route_stops TEXT DEFAULT NULL",
+        "ALTER TABLE bookings ADD COLUMN boarding_status VARCHAR(50) DEFAULT 'Pending'",
+        "ALTER TABLE bookings ADD COLUMN stop_distance VARCHAR(100) DEFAULT NULL"
+    ];
+    foreach ($alterStatements as $sql) {
+        try {
+            $pdo->exec($sql);
+        } catch (Exception $e) {
+            // Column already exists, ignore silently
+        }
+    }
 }
 
 /**
@@ -167,7 +205,6 @@ function initSqliteDatabase($pdo) {
             phone TEXT,
             password TEXT NOT NULL,
             role TEXT DEFAULT 'user',
-            wallet_balance REAL DEFAULT 150.00,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
@@ -229,16 +266,6 @@ function initSqliteDatabase($pdo) {
             UNIQUE(bus_id, travel_date, seat_no)
         );
 
-        CREATE TABLE IF NOT EXISTS wallet_transactions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            type TEXT NOT NULL,
-            title TEXT NOT NULL,
-            amount REAL NOT NULL,
-            reference TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-
         CREATE TABLE IF NOT EXISTS coupons (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             code TEXT UNIQUE NOT NULL,
@@ -284,7 +311,7 @@ function initSqliteDatabase($pdo) {
 
     // Seed default admin (No hardcoded buses; all fleet buses are added dynamically by admin)
     $adminHash = password_hash('amir2010khan', PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare("INSERT OR IGNORE INTO users (id, name, email, phone, password, role, wallet_balance) VALUES (1, 'Admin', 'admin@safarsathi.com', '9876543210', ?, 'admin', 5000.00)");
+    $stmt = $pdo->prepare("INSERT OR IGNORE INTO users (id, name, email, phone, password, role) VALUES (1, 'Admin', 'admin@safarsathi.com', '9876543210', ?, 'admin')");
     $stmt->execute([$adminHash]);
 
     // Seed coupons

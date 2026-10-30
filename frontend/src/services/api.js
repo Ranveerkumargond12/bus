@@ -113,12 +113,6 @@ export const api = {
     getAll: () => request('/bookings')
   },
 
-  // Wallet API
-  wallet: {
-    get: (email = '') => request(`/wallet${email ? `?email=${encodeURIComponent(email)}` : ''}`),
-    addMoney: (data) => request('/wallet', { method: 'POST', body: data })
-  },
-
   // Coupons API
   coupons: {
     getAll: () => request('/coupons'),
@@ -153,6 +147,14 @@ export const api = {
     addBus: (busData) => request('/admin/add-bus', { method: 'POST', body: busData }),
     updateBus: (id, busData) => request(`/admin/update-bus/${id}`, { method: 'POST', body: busData }),
     deleteBus: (id) => request(`/admin/delete-bus/${id}`, { method: 'DELETE' })
+  },
+
+  // Conductor Portal API
+  conductor: {
+    login: (credentials) => request('/conductor/login', { method: 'POST', body: credentials }),
+    getBuses: () => request('/conductor/manifest'),
+    getManifest: (busId, date = 'ALL') => request(`/conductor/manifest?bus_id=${busId}&date=${encodeURIComponent(date)}`),
+    updateBoarding: (pnr, boardingStatus) => request('/conductor/board', { method: 'POST', body: { pnr, boarding_status: boardingStatus } })
   }
 };
 

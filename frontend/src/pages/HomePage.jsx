@@ -13,6 +13,7 @@ export function HomePage() {
   const [busType, setBusType] = useState('All');
   const [isSwapped, setIsSwapped] = useState(false);
   const [popularRoutes, setPopularRoutes] = useState([]);
+  const [allStops, setAllStops] = useState([]);
   const [loadingRoutes, setLoadingRoutes] = useState(true);
 
   useEffect(() => {
@@ -21,6 +22,9 @@ export function HomePage() {
         const res = await api.buses.getPopularRoutes();
         if (res && res.data) {
           setPopularRoutes(res.data);
+        }
+        if (res && Array.isArray(res.all_stops)) {
+          setAllStops(res.all_stops);
         }
       } catch (err) {
         console.warn('Could not fetch routes:', err);
@@ -86,16 +90,23 @@ export function HomePage() {
 
       {/* Floating Search Widget */}
       <div className="search-widget-container">
+        <datalist id="busStopsList">
+          {allStops.map((stopName, i) => (
+            <option key={i} value={stopName} />
+          ))}
+        </datalist>
+
         <form onSubmit={handleSearch} className="search-widget-form">
           {/* FROM */}
           <div className="form-group">
-            <label htmlFor="fromInput">FROM</label>
+            <label htmlFor="fromInput">FROM (CITY / STOP)</label>
             <input
               type="text"
               id="fromInput"
+              list="busStopsList"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
-              placeholder="Departure City (e.g. Mumbai)"
+              placeholder="City or Bus Stop (e.g. Lucknow)"
               required
             />
           </div>
@@ -116,13 +127,14 @@ export function HomePage() {
 
           {/* TO */}
           <div className="form-group">
-            <label htmlFor="toInput">TO</label>
+            <label htmlFor="toInput">TO (CITY / STOP)</label>
             <input
               type="text"
               id="toInput"
+              list="busStopsList"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              placeholder="Destination City (e.g. Goa)"
+              placeholder="Destination or Stop (e.g. Kanpur)"
               required
             />
           </div>
@@ -200,27 +212,9 @@ export function HomePage() {
             >
               <div style={{ fontSize: '32px', marginBottom: '8px' }}>🚌</div>
               <h3 style={{ color: '#1c2430', margin: '0 0 6px 0', fontSize: '1.15rem' }}>No Bus Routes Scheduled Yet</h3>
-              <p style={{ color: '#64748b', fontSize: '13px', margin: '0 0 16px 0' }}>
-                All bus routes are managed directly by the administrator. Log in to the Admin Dashboard to add fleet buses and live routes.
+              <p style={{ color: '#64748b', fontSize: '13px', margin: 0 }}>
+                Bus routes and stops will appear here automatically once scheduled.
               </p>
-              <Link
-                to="/admin"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '9px 20px',
-                  background: '#008cff',
-                  color: '#ffffff',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  fontWeight: 'bold',
-                  fontSize: '13px',
-                  boxShadow: '0 3px 10px rgba(0, 140, 255, 0.25)'
-                }}
-              >
-                ⚙️ Open Admin Dashboard to Add Bus
-              </Link>
             </div>
           )}
         </div>

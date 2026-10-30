@@ -92,8 +92,8 @@ export function SearchResultsPage() {
   const handleSelectSeats = (bus) => {
     const params = new URLSearchParams({
       busId: bus.id,
-      from: fromLocation || bus.source,
-      to: toLocation || bus.destination,
+      from: bus.matched_from || fromLocation || bus.source,
+      to: bus.matched_to || toLocation || bus.destination,
       date: travelDate
     });
     navigate(`/seat-selection?${params.toString()}`);
@@ -286,29 +286,20 @@ export function SearchResultsPage() {
               <p style={{ color: '#64748b', margin: '0 0 15px 0' }}>
                 No active buses found matching "{fromLocation || 'Any'} ➔ {toLocation || 'Any'}" on {travelDate}.
               </p>
-              <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '20px' }}>
-                All bus routes in SafarSathi are added and managed by the administrator.
+              <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '0' }}>
+                Try searching with another city or date.
               </p>
-              <button
-                type="button"
-                onClick={() => navigate('/admin')}
-                style={{
-                  padding: '9px 20px',
-                  background: '#008cff',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  fontSize: '13px'
-                }}
-              >
-                ⚙️ Admin Panel: Add Bus to Fleet
-              </button>
             </div>
           )}
 
-          {!loading && filteredBuses.map((bus) => (
+          {!loading && filteredBuses.map((bus) => {
+            const stopsList = Array.isArray(bus.route_stops) ? bus.route_stops : [];
+            let displayedFare = Number(bus.matched_fare || bus.fare) || 0;
+            const matchedFrom = bus.matched_from || bus.source;
+            const matchedTo = bus.matched_to || bus.destination;
+            const isSubRoute = matchedFrom !== bus.source || matchedTo !== bus.destination;
+
+            return (
             <div
               key={bus.id}
               style={{
@@ -331,9 +322,19 @@ export function SearchResultsPage() {
                 <h3 style={{ margin: '0 0 6px 0', color: '#1c2430', fontSize: '1.15rem' }}>
                   {bus.bus_name} {bus.bus_number && <span style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: 'normal' }}>({bus.bus_number})</span>}
                 </h3>
-                <div style={{ color: '#008cff', fontWeight: 600, fontSize: '0.95rem', marginBottom: '6px' }}>
-                  {bus.source} ➔ {bus.destination}
+                <div style={{ color: '#008cff', fontWeight: 700, fontSize: '0.98rem', marginBottom: '4px' }}>
+                  {matchedFrom} ➔ {matchedTo} {bus.matched_distance && <span style={{ fontSize: '12px', color: '#0f766e' }}>({bus.matched_distance})</span>}
                 </div>
+                {isSubRoute && (
+                  <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px' }}>
+                    🚌 Full Bus Route: {bus.source} ➔ {bus.destination} (Full Fare: ₹{bus.fare})
+                  </div>
+                )}
+                {stopsList.length > 0 && (
+                  <div style={{ fontSize: '12px', color: '#0369a1', background: '#f0f9ff', padding: '4px 8px', borderRadius: '6px', display: 'inline-block', marginBottom: '6px' }}>
+                    🚏 Via Stops: {stopsList.map(s => `${s.stop_name} (₹${s.fare})`).join(' ➔ ')}
+                  </div>
+                )}
                 <div style={{ color: '#64748b', fontSize: '0.85rem' }}>
                   {bus.bus_type}
                 </div>
@@ -360,7 +361,7 @@ export function SearchResultsPage() {
               {/* Price & Action */}
               <div style={{ textAlign: 'right', minWidth: '140px' }}>
                 <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#10b981', marginBottom: '8px' }}>
-                  ₹{bus.fare}
+                  ₹{displayedFare}
                 </div>
                 <button
                   type="button"
@@ -382,7 +383,8 @@ export function SearchResultsPage() {
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

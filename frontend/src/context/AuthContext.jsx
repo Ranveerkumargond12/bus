@@ -71,16 +71,6 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('travelgo_user');
   };
 
-  const updateWalletBalance = (newBalance) => {
-    setUser(prev => {
-      if (!prev) return prev;
-      const updated = { ...prev, wallet_balance: newBalance };
-      localStorage.setItem('safarsathi_user', JSON.stringify(updated));
-      localStorage.setItem('travelgo_user', JSON.stringify(updated));
-      return updated;
-    });
-  };
-
   const refreshUser = async () => {
     if (!token) return;
     try {
@@ -101,7 +91,6 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
-    updateWalletBalance,
     refreshUser
   };
 

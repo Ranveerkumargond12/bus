@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Toast } from '../components/Toast';
 
 export function AdminDashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [stats, setStats] = useState({
     total_revenue: 0,
@@ -29,6 +31,7 @@ export function AdminDashboardPage() {
     bus_type: 'AC Sleeper (2+1)',
     source: '',
     destination: '',
+    distance: '',
     departure_time: '09:00 PM',
     arrival_time: '07:30 AM',
     duration: '10h 30m',
@@ -36,7 +39,11 @@ export function AdminDashboardPage() {
     seats_capacity: 24,
     amenities: 'WiFi, Charging Point, Blanket, Water Bottle',
     boarding_points: '',
-    dropping_points: ''
+    dropping_points: '',
+    conductor_name: '',
+    conductor_phone: '',
+    conductor_pin: '1234',
+    route_stops: []
   });
 
   const loadAllAdminData = async () => {
@@ -93,6 +100,7 @@ export function AdminDashboardPage() {
       bus_type: bus.bus_type || 'AC Sleeper (2+1)',
       source: bus.source || '',
       destination: bus.destination || '',
+      distance: bus.distance || '',
       departure_time: bus.departure_time || '',
       arrival_time: bus.arrival_time || '',
       duration: bus.duration || '10h 30m',
@@ -100,7 +108,11 @@ export function AdminDashboardPage() {
       seats_capacity: bus.seats_capacity || 24,
       amenities: bus.amenities || 'WiFi, Charging Point, Blanket, Water Bottle',
       boarding_points: bus.boarding_points || '',
-      dropping_points: bus.dropping_points || ''
+      dropping_points: bus.dropping_points || '',
+      conductor_name: bus.conductor_name || '',
+      conductor_phone: bus.conductor_phone || '',
+      conductor_pin: bus.conductor_pin || '1234',
+      route_stops: Array.isArray(bus.route_stops) ? bus.route_stops : []
     });
     window.scrollTo({ top: 380, behavior: 'smooth' });
   };
@@ -113,6 +125,7 @@ export function AdminDashboardPage() {
       bus_type: 'AC Sleeper (2+1)',
       source: '',
       destination: '',
+      distance: '',
       departure_time: '09:00 PM',
       arrival_time: '07:30 AM',
       duration: '10h 30m',
@@ -120,8 +133,37 @@ export function AdminDashboardPage() {
       seats_capacity: 24,
       amenities: 'WiFi, Charging Point, Blanket, Water Bottle',
       boarding_points: '',
-      dropping_points: ''
+      dropping_points: '',
+      conductor_name: '',
+      conductor_phone: '',
+      conductor_pin: '1234',
+      route_stops: []
     });
+  };
+
+  const handleAddStop = () => {
+    setBusForm(prev => ({
+      ...prev,
+      route_stops: [
+        ...(prev.route_stops || []),
+        { stop_name: '', fare: '', distance: '', arrival_time: '' }
+      ]
+    }));
+  };
+
+  const handleUpdateStop = (idx, field, value) => {
+    setBusForm(prev => {
+      const updated = [...(prev.route_stops || [])];
+      updated[idx] = { ...updated[idx], [field]: value };
+      return { ...prev, route_stops: updated };
+    });
+  };
+
+  const handleRemoveStop = (idx) => {
+    setBusForm(prev => ({
+      ...prev,
+      route_stops: (prev.route_stops || []).filter((_, i) => i !== idx)
+    }));
   };
 
   const handleSaveBus = async (e) => {
@@ -397,6 +439,132 @@ export function AdminDashboardPage() {
             />
           </div>
 
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#0369a1', marginBottom: '4px' }}>🛣️ Route Distance / Highway Info</label>
+            <input
+              type="text"
+              placeholder="e.g. 480 KM (Via Agra Expressway)"
+              value={busForm.distance}
+              onChange={(e) => setBusForm({ ...busForm, distance: e.target.value })}
+              style={{ width: '100%', padding: '9px', border: '1px solid #93c5fd', borderRadius: '6px', background: '#f0f9ff' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#0369a1', marginBottom: '4px' }}>🧑‍✈️ Bus Conductor Name</label>
+            <input
+              type="text"
+              placeholder="e.g. Ramesh Kumar"
+              value={busForm.conductor_name}
+              onChange={(e) => setBusForm({ ...busForm, conductor_name: e.target.value })}
+              style={{ width: '100%', padding: '9px', border: '1px solid #93c5fd', borderRadius: '6px', background: '#f0f9ff' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#0369a1', marginBottom: '4px' }}>📞 Conductor Mobile No. (Login ID)</label>
+            <input
+              type="text"
+              placeholder="e.g. 9876543210"
+              value={busForm.conductor_phone}
+              onChange={(e) => setBusForm({ ...busForm, conductor_phone: e.target.value })}
+              style={{ width: '100%', padding: '9px', border: '1px solid #93c5fd', borderRadius: '6px', background: '#f0f9ff' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#0369a1', marginBottom: '4px' }}>🔑 Conductor Login PIN</label>
+            <input
+              type="text"
+              placeholder="Default: 1234"
+              value={busForm.conductor_pin}
+              onChange={(e) => setBusForm({ ...busForm, conductor_pin: e.target.value })}
+              style={{ width: '100%', padding: '9px', border: '1px solid #93c5fd', borderRadius: '6px', background: '#f0f9ff' }}
+            />
+          </div>
+
+          {/* Intermediate Bus Stops & Stop-wise Pricing Builder */}
+          <div style={{ gridColumn: '1 / -1', background: '#f8fafc', border: '1.5px dashed #93c5fd', borderRadius: '12px', padding: '16px', marginTop: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+              <div>
+                <div style={{ fontWeight: 'bold', color: '#0369a1', fontSize: '14px' }}>
+                  🚏 Intermediate Bus Stops & Stop-wise Fare (Optional)
+                </div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>
+                  Add stops between <strong>{busForm.source || 'Origin'}</strong> and <strong>{busForm.destination || 'Destination'}</strong> with individual stop price & distance
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleAddStop}
+                style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '7px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                + Add Bus Stop & Price
+              </button>
+            </div>
+
+            {(busForm.route_stops || []).length === 0 ? (
+              <div style={{ fontSize: '12px', color: '#94a3b8', fontStyle: 'italic' }}>
+                No intermediate stops added yet. Click "+ Add Bus Stop & Price" to add stops along this bus route.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {(busForm.route_stops || []).map((st, idx) => (
+                  <div key={idx} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr)) auto', gap: '10px', alignItems: 'center', background: '#ffffff', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', color: '#475569' }}>Stop #{idx + 1} City / Name *</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Kanpur / Bhopal"
+                        value={st.stop_name || ''}
+                        onChange={(e) => handleUpdateStop(idx, 'stop_name', e.target.value)}
+                        style={{ width: '100%', padding: '7px', border: '1px solid #cbd5e1', borderRadius: '5px', fontSize: '13px' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', color: '#15803d' }}>Fare from Origin (₹) *</label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 350"
+                        value={st.fare || ''}
+                        onChange={(e) => handleUpdateStop(idx, 'fare', e.target.value)}
+                        style={{ width: '100%', padding: '7px', border: '1px solid #86efac', borderRadius: '5px', fontSize: '13px', fontWeight: 'bold' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', color: '#475569' }}>Distance from Origin</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 90 KM"
+                        value={st.distance || ''}
+                        onChange={(e) => handleUpdateStop(idx, 'distance', e.target.value)}
+                        style={{ width: '100%', padding: '7px', border: '1px solid #cbd5e1', borderRadius: '5px', fontSize: '13px' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', color: '#475569' }}>Stop Arrival Time</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 11:30 PM"
+                        value={st.arrival_time || ''}
+                        onChange={(e) => handleUpdateStop(idx, 'arrival_time', e.target.value)}
+                        style={{ width: '100%', padding: '7px', border: '1px solid #cbd5e1', borderRadius: '5px', fontSize: '13px' }}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveStop(idx)}
+                      style={{ background: '#fee2e2', color: '#dc2626', border: 'none', padding: '7px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', marginTop: '14px' }}
+                      title="Remove Stop"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
             <button
               type="submit"
@@ -457,10 +625,10 @@ export function AdminDashboardPage() {
                 <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
                   <th style={{ padding: '10px' }}>ID</th>
                   <th style={{ padding: '10px' }}>Bus Operator</th>
-                  <th style={{ padding: '10px' }}>Route</th>
+                  <th style={{ padding: '10px' }}>Route & Distance</th>
+                  <th style={{ padding: '10px' }}>Conductor Info</th>
                   <th style={{ padding: '10px' }}>Timing & Duration</th>
                   <th style={{ padding: '10px' }}>Fare</th>
-                  <th style={{ padding: '10px' }}>Capacity</th>
                   <th style={{ padding: '10px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
@@ -472,14 +640,41 @@ export function AdminDashboardPage() {
                       <div style={{ fontWeight: 'bold', color: '#1c2430' }}>{b.bus_name}</div>
                       <div style={{ fontSize: '11px', color: '#64748b' }}>{b.bus_type} • {b.bus_number || 'No Plate'}</div>
                     </td>
-                    <td style={{ padding: '10px', color: '#008cff', fontWeight: 'bold' }}>{b.source} ➔ {b.destination}</td>
+                    <td style={{ padding: '10px' }}>
+                      <div style={{ color: '#008cff', fontWeight: 'bold' }}>{b.source} ➔ {b.destination}</div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>🛣️ {b.distance || 'Distance not set'}</div>
+                      {Array.isArray(b.route_stops) && b.route_stops.length > 0 && (
+                        <div style={{ fontSize: '11px', color: '#0f766e', marginTop: '3px', fontWeight: '600' }}>
+                          🚏 Stops: {b.route_stops.map(s => `${s.stop_name} (₹${s.fare})`).join(' ➔ ')}
+                        </div>
+                      )}
+                    </td>
+                    <td style={{ padding: '10px' }}>
+                      {b.conductor_name ? (
+                        <div>
+                          <div style={{ fontWeight: 'bold', color: '#0369a1' }}>🧑‍✈️ {b.conductor_name}</div>
+                          <div style={{ fontSize: '11px', color: '#64748b' }}>
+                            📞 {b.conductor_phone || 'N/A'} • PIN: <strong>{b.conductor_pin || '1234'}</strong>
+                          </div>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: '11px', color: '#94a3b8' }}>Not Assigned</span>
+                      )}
+                    </td>
                     <td style={{ padding: '10px' }}>
                       <div>{b.departure_time} - {b.arrival_time}</div>
-                      <div style={{ fontSize: '11px', color: '#64748b' }}>{b.duration}</div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>{b.duration} • {b.seats_capacity || 24} seats</div>
                     </td>
                     <td style={{ padding: '10px', fontWeight: 'bold', color: '#10b981' }}>₹{b.fare}</td>
-                    <td style={{ padding: '10px' }}>{b.seats_capacity || 24} seats</td>
-                    <td style={{ padding: '10px', textAlign: 'right' }}>
+                    <td style={{ padding: '10px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/conductor?busId=${b.id}`)}
+                        style={{ background: '#dcfce7', color: '#15803d', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '11px', marginRight: '6px' }}
+                        title="Open Conductor Ticket Chart for this Bus"
+                      >
+                        🧑‍✈️ Conductor Sheet
+                      </button>
                       <button
                         type="button"
                         onClick={() => handleStartEdit(b)}
@@ -551,7 +746,6 @@ export function AdminDashboardPage() {
                 <th style={{ padding: '10px' }}>Name</th>
                 <th style={{ padding: '10px' }}>Email</th>
                 <th style={{ padding: '10px' }}>Role</th>
-                <th style={{ padding: '10px' }}>Wallet</th>
                 <th style={{ padding: '10px', textAlign: 'right' }}>Action</th>
               </tr>
             </thead>
@@ -566,7 +760,6 @@ export function AdminDashboardPage() {
                       {u.role}
                     </span>
                   </td>
-                  <td style={{ padding: '10px', fontWeight: 'bold' }}>₹{u.wallet_balance || 0}</td>
                   <td style={{ padding: '10px', textAlign: 'right' }}>
                     {u.id !== 1 && (
                       <button

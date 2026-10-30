@@ -66,18 +66,11 @@ export function Navbar() {
 
           <li><Link to="/">Home</Link></li>
           {isAdmin ? (
-            <>
-              <li>
-                <Link to="/admin" style={{ color: '#008cff', fontWeight: 'bold' }}>
-                  ⚙️ Admin Panel
-                </Link>
-              </li>
-              <li>
-                <Link to="/my-bookings" style={{ color: '#10b981', fontWeight: 'bold' }}>
-                  🎫 Customer Tickets
-                </Link>
-              </li>
-            </>
+            <li>
+              <Link to="/my-bookings" style={{ color: '#10b981', fontWeight: 'bold' }}>
+                🎫 Customer Tickets
+              </Link>
+            </li>
           ) : (
             <li><Link to="/my-bookings">My Bookings</Link></li>
           )}
@@ -101,7 +94,19 @@ export function Navbar() {
               boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
             }}
           >
-            <span style={{ whiteSpace: 'nowrap' }}>👤 {displayName}</span>
+            <span
+              onClick={() => {
+                if (isAdmin) navigate('/admin');
+                else if (user?.role === 'conductor') navigate(user?.bus_id ? `/conductor?busId=${user.bus_id}` : '/conductor');
+              }}
+              style={{
+                whiteSpace: 'nowrap',
+                cursor: (isAdmin || user?.role === 'conductor') ? 'pointer' : 'default'
+              }}
+              title={isAdmin ? 'Open Admin Dashboard' : user?.role === 'conductor' ? 'Open Conductor Portal' : displayName}
+            >
+              👤 {displayName}
+            </span>
 
             <button
               onClick={handleLogout}
@@ -135,18 +140,11 @@ export function Navbar() {
           <ul className="nav-links">
             <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>🏠 Home</Link></li>
             {isAdmin ? (
-              <>
-                <li>
-                  <Link to="/admin" onClick={() => setMobileMenuOpen(false)} style={{ color: '#008cff', fontWeight: 'bold' }}>
-                    ⚙️ Admin Panel
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/my-bookings" onClick={() => setMobileMenuOpen(false)} style={{ color: '#10b981', fontWeight: 'bold' }}>
-                    🎫 Customer Tickets
-                  </Link>
-                </li>
-              </>
+              <li>
+                <Link to="/my-bookings" onClick={() => setMobileMenuOpen(false)} style={{ color: '#10b981', fontWeight: 'bold' }}>
+                  🎫 Customer Tickets
+                </Link>
+              </li>
             ) : (
               <li><Link to="/my-bookings" onClick={() => setMobileMenuOpen(false)}>🎫 My Bookings</Link></li>
             )}

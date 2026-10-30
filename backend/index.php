@@ -80,13 +80,7 @@ if ($seg0 === 'bookings' || $seg0 === 'book-ticket' || $seg0 === 'my-bookings' |
     handleBookingsRoutes($method, $segments, $input);
 }
 
-// 5. Wallet & Recharge
-if ($seg0 === 'wallet') {
-    require_once __DIR__ . '/api/wallet.php';
-    handleWalletRoutes($method, $segments, $input);
-}
-
-// 6. Coupons & Offers
+// 5. Coupons & Offers
 if ($seg0 === 'coupons' || $seg0 === 'offers') {
     require_once __DIR__ . '/api/coupons.php';
     handleCouponsRoutes($method, $segments, $input);
@@ -114,6 +108,12 @@ if ($seg0 === 'reviews') {
 if ($seg0 === 'admin') {
     require_once __DIR__ . '/api/admin.php';
     handleAdminRoutes($method, $segments, $input);
+}
+
+// 11. Conductor Portal & Bus Manifest
+if ($seg0 === 'conductor') {
+    require_once __DIR__ . '/api/conductor.php';
+    handleConductorRoutes($method, $segments, $input);
 }
 
 // 404 Endpoint Not Found

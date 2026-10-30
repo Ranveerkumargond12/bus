@@ -133,9 +133,12 @@ function handleBookingsRoutes($method, $segments, $input) {
             sendError('Selected bus route does not exist.', 404);
         }
 
-        $source = $bus['source'];
-        $destination = $bus['destination'];
-        $baseSeatFare = (float)$bus['fare'];
+        $source = !empty($input['source']) ? trim($input['source']) : $bus['source'];
+        $destination = !empty($input['destination']) ? trim($input['destination']) : $bus['destination'];
+        $stopDistance = !empty($input['stop_distance']) ? trim($input['stop_distance']) : ($bus['distance'] ?? '');
+        $baseSeatFare = (isset($input['custom_seat_fare']) && (float)$input['custom_seat_fare'] > 0)
+            ? (float)$input['custom_seat_fare']
+            : (float)$bus['fare'];
         $seatCount = count($seats);
         $calculatedBaseFare = $baseSeatFare * $seatCount;
 
@@ -200,43 +203,14 @@ function handleBookingsRoutes($method, $segments, $input) {
                 }
             }
 
-            // Wallet Payment Deductions
             $userId = $currentUser['id'] ?? null;
             if (!$userId && !empty($passengerEmail)) {
-                $userCheck = $pdo->prepare("SELECT id, wallet_balance FROM users WHERE email = ?");
+                $userCheck = $pdo->prepare("SELECT id FROM users WHERE email = ?");
                 $userCheck->execute([$passengerEmail]);
                 $uRow = $userCheck->fetch();
                 if ($uRow) {
                     $userId = (int)$uRow['id'];
                 }
-            }
-
-            if (strtolower($paymentMethod) === 'wallet') {
-                if (!$userId) {
-                    $pdo->rollBack();
-                    sendError('You must be logged in to pay with your wallet.', 401);
-                }
-
-                $userWalletStmt = $pdo->prepare("SELECT wallet_balance FROM users WHERE id = ?");
-                $userWalletStmt->execute([$userId]);
-                $currentBalance = (float)$userWalletStmt->fetchColumn();
-
-                if ($currentBalance < $finalTotalFare) {
-                    $pdo->rollBack();
-                    sendError("Insufficient wallet balance (₹$currentBalance). Please add funds or choose another payment method.", 400);
-                }
-
-                // Deduct from wallet
-                $newBalance = $currentBalance - $finalTotalFare;
-                $updateWallet = $pdo->prepare("UPDATE users SET wallet_balance = ? WHERE id = ?");
-                $updateWallet->execute([$newBalance, $userId]);
-
-                // Record Debit Transaction
-                $txStmt = $pdo->prepare("
-                    INSERT INTO wallet_transactions (user_id, type, title, amount, reference)
-                    VALUES (?, 'Debit', ?, ?, ?)
-                ");
-                $txStmt->execute([$userId, "Bus Booking ($source to $destination)", $finalTotalFare, "PNR-PENDING"]);
             }
 
             // Generate unique PNR
@@ -250,10 +224,10 @@ function handleBookingsRoutes($method, $segments, $input) {
             $insertBooking = $pdo->prepare("
                 INSERT INTO bookings (
                     pnr, user_id, bus_id, passenger_name, passenger_email, passenger_phone,
-                    source, destination, seat_no, travel_date,
+                    source, destination, stop_distance, seat_no, travel_date,
                     base_fare, tax_fare, addons_fare, discount_amount, total_fare,
                     addons, passengers_detail, status, payment_status, payment_method
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Confirmed', 'Paid', ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Confirmed', 'Paid', ?)
             ");
 
             $insertBooking->execute([
@@ -265,6 +239,7 @@ function handleBookingsRoutes($method, $segments, $input) {
                 $passengerPhone,
                 $source,
                 $destination,
+                $stopDistance,
                 $seatNoStr,
                 $travelDate,
                 $calculatedBaseFare,
@@ -278,12 +253,6 @@ function handleBookingsRoutes($method, $segments, $input) {
             ]);
 
             $bookingId = (int)$pdo->lastInsertId();
-
-            // Update wallet transaction reference if wallet paid
-            if (strtolower($paymentMethod) === 'wallet' && $userId) {
-                $updateTx = $pdo->prepare("UPDATE wallet_transactions SET reference = ? WHERE user_id = ? AND reference = 'PNR-PENDING'");
-                $updateTx->execute([$pnr, $userId]);
-            }
 
             // Clear temporary seat holds
             $delHolds = $pdo->prepare("DELETE FROM seat_holds WHERE bus_id = ? AND travel_date = ? AND seat_no IN (" . implode(',', array_fill(0, count($seats), '?')) . ")");
@@ -331,7 +300,7 @@ function handleBookingsRoutes($method, $segments, $input) {
             sendError('This booking is already cancelled.', 400);
         }
 
-        // Start transaction for cancellation and refund
+        // Start transaction for cancellation
         $pdo->beginTransaction();
 
         try {
@@ -339,33 +308,11 @@ function handleBookingsRoutes($method, $segments, $input) {
             $upStmt = $pdo->prepare("UPDATE bookings SET status = 'Cancelled', payment_status = 'Refunded' WHERE pnr = ?");
             $upStmt->execute([$pnr]);
 
-            // If user has an account, refund total fare back to user's wallet!
-            $refundAmount = (float)$booking['total_fare'];
-            $refundTargetUserId = $booking['user_id'];
-
-            if (!$refundTargetUserId && !empty($booking['passenger_email'])) {
-                $uStmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-                $uStmt->execute([$booking['passenger_email']]);
-                $refundTargetUserId = $uStmt->fetchColumn();
-            }
-
-            if ($refundTargetUserId && $refundAmount > 0) {
-                $refUser = $pdo->prepare("UPDATE users SET wallet_balance = wallet_balance + ? WHERE id = ?");
-                $refUser->execute([$refundAmount, $refundTargetUserId]);
-
-                $txStmt = $pdo->prepare("
-                    INSERT INTO wallet_transactions (user_id, type, title, amount, reference)
-                    VALUES (?, 'Credit', ?, ?, ?)
-                ");
-                $txStmt->execute([$refundTargetUserId, "Refund for Cancelled Ticket ($pnr)", $refundAmount, $pnr]);
-            }
-
             $pdo->commit();
 
             sendResponse([
                 'success' => true,
-                'message' => "Booking ($pnr) cancelled successfully! Refund of ₹$refundAmount credited to your wallet.",
-                'refundAmount' => $refundAmount
+                'message' => "Booking ($pnr) cancelled successfully!"
             ]);
 
         } catch (Exception $e) {

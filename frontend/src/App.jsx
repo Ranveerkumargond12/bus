@@ -21,10 +21,10 @@ import { SeatSelectionPage } from './pages/SeatSelectionPage';
 import { PassengerPage } from './pages/PassengerPage';
 import { PaymentPage } from './pages/PaymentPage';
 import { MyBookingsPage } from './pages/MyBookingsPage';
-import { WalletPage } from './pages/WalletPage';
 import { AuthPage } from './pages/AuthPage';
 import { OffersPage } from './pages/OffersPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { ConductorPage } from './pages/ConductorPage';
 import { OperatorRegisterPage } from './pages/OperatorRegisterPage';
 import { AgentRegisterPage } from './pages/AgentRegisterPage';
 import { AboutPage, SupportPage } from './pages/AboutPage';
@@ -63,10 +63,10 @@ export function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/wallet" element={<Navigate to="/" replace />} />
 
-        {/* Auth & Admin */}
+        {/* Auth, Admin & Conductor */}
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/conductor" element={<ConductorPage />} />
         <Route
           path="/admin"
           element={

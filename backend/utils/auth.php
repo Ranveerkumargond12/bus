@@ -128,7 +128,30 @@ function getCurrentUser() {
     }
 
     $pdo = getDB();
-    $stmt = $pdo->prepare("SELECT id, name, email, phone, role, wallet_balance, created_at FROM users WHERE id = ?");
+
+    // Check if logged-in session is a Bus Conductor
+    if (($payload['role'] ?? '') === 'conductor') {
+        $busId = (int)($payload['bus_id'] ?? $payload['sub']);
+        $bStmt = $pdo->prepare("SELECT * FROM buses WHERE id = ?");
+        $bStmt->execute([$busId]);
+        $bus = $bStmt->fetch();
+        if ($bus) {
+            $currentUser = [
+                'id' => (int)$bus['id'],
+                'bus_id' => (int)$bus['id'],
+                'bus_name' => $bus['bus_name'],
+                'bus_number' => $bus['bus_number'],
+                'name' => !empty($bus['conductor_name']) ? $bus['conductor_name'] : ($bus['bus_name'] . ' Conductor'),
+                'email' => !empty($bus['conductor_phone']) ? $bus['conductor_phone'] : ($bus['bus_number'] ?? ''),
+                'phone' => $bus['conductor_phone'] ?? '',
+                'role' => 'conductor'
+            ];
+            return $currentUser;
+        }
+        return null;
+    }
+
+    $stmt = $pdo->prepare("SELECT id, name, email, phone, role, created_at FROM users WHERE id = ?");
     $stmt->execute([(int)$payload['sub']]);
     $user = $stmt->fetch();
 

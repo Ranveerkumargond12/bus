@@ -87,6 +87,10 @@ export function PaymentPage() {
     const payload = {
       bus_id: bookingData.busId,
       travel_date: bookingData.travelDate,
+      source: bookingData.from || '',
+      destination: bookingData.to || '',
+      stop_distance: bookingData.stopDistance || '',
+      custom_seat_fare: bookingData.baseSeatPrice || 0,
       seat_no: Array.isArray(bookingData.seats) ? bookingData.seats.join(',') : bookingData.seats,
       passenger_name: bookingData.passengers?.[0]?.name || user?.name || 'Passenger',
       passenger_email: user?.email || bookingData.contact?.email || '',

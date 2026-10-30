@@ -38,14 +38,16 @@ export function AuthPage() {
 
       setToast({ type: 'success', message: `Welcome back, ${user.name}!` });
       setTimeout(() => {
-        if (user.role === 'admin' && (!redirectTarget || redirectTarget === '/')) {
+        if (user.role === 'admin') {
           navigate('/admin');
+        } else if (user.role === 'conductor') {
+          navigate(user.bus_id ? `/conductor?busId=${user.bus_id}` : '/conductor');
         } else {
           navigate(redirectTarget || '/');
         }
-      }, 1000);
+      }, 600);
     } catch (err) {
-      setToast({ type: 'error', message: err.message || 'Invalid email or password' });
+      setToast({ type: 'error', message: err.message || 'Invalid Login ID or Password' });
     } finally {
       setLoading(false);
     }
@@ -97,10 +99,10 @@ export function AuthPage() {
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <div style={{ fontSize: '36px', marginBottom: '8px' }}>🚌</div>
           <h2 style={{ margin: '0 0 6px 0', color: '#1c2430', fontSize: '1.5rem' }}>
-            {isLoginTab ? 'Welcome Back' : 'Create an Account'}
+            {isLoginTab ? 'Welcome Back' : 'Create User Account'}
           </h2>
           <p style={{ margin: 0, color: '#64748b', fontSize: '13px' }}>
-            {isLoginTab ? 'Log in to manage bookings and speedy checkout' : 'Join SafarSathi for fast bus bookings and instant ticket confirmation'}
+            {isLoginTab ? 'Log in as User, Bus Conductor, or Admin' : 'Passenger Sign Up — Create your user account to book bus tickets'}
           </p>
         </div>
 
@@ -142,7 +144,7 @@ export function AuthPage() {
               transition: 'all 0.2s'
             }}
           >
-            Sign Up
+            User Sign Up
           </button>
         </div>
 
@@ -167,11 +169,11 @@ export function AuthPage() {
 
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#475569', marginBottom: '6px' }}>
-                Email or Mobile Number
+                Email, Mobile Number, or Conductor ID
               </label>
               <input
                 type="text"
-                placeholder="e.g. admin@safarsathi.com"
+                placeholder="Enter Email, Mobile or Conductor ID"
                 value={loginIdentifier}
                 onChange={(e) => setLoginIdentifier(e.target.value)}
                 required
@@ -181,7 +183,7 @@ export function AuthPage() {
 
             <div style={{ marginBottom: '22px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#475569' }}>Password</label>
+                <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#475569' }}>Password / PIN</label>
               </div>
               <input
                 type="password"
@@ -213,8 +215,12 @@ export function AuthPage() {
             </button>
           </form>
         ) : (
-          /* SIGNUP FORM */
+          /* SIGNUP FORM (USER / PASSENGER ONLY) */
           <form onSubmit={handleSignupSubmit}>
+            <div style={{ background: '#ecfdf5', padding: '10px 14px', borderRadius: '8px', border: '1px solid #a7f3d0', marginBottom: '16px', fontSize: '12px', color: '#047857', fontWeight: '600' }}>
+              👤 Passenger / Customer Account Only (Conductor IDs are created by Admin)
+            </div>
+
             <div style={{ marginBottom: '14px' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#475569', marginBottom: '6px' }}>
                 Full Name *
@@ -286,7 +292,7 @@ export function AuthPage() {
                 boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)'
               }}
             >
-              {loading ? 'Creating Account...' : 'Create Account & Get ₹150'}
+              {loading ? 'Creating User Account...' : 'Create User Account'}
             </button>
           </form>
         )}

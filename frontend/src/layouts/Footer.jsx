@@ -41,7 +41,6 @@ export function Footer() {
             <li><Link to="/register-agent">Become an Agent</Link></li>
             <li><Link to="/advertise">Advertise Your Bus Route</Link></li>
             <li><Link to="/affiliate">Affiliate Program</Link></li>
-            <li><Link to="/admin" style={{ color: '#008cff', fontWeight: 'bold' }}>⚙️ Admin Portal</Link></li>
           </ul>
         </div>
 

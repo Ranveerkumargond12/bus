@@ -108,17 +108,18 @@ function handleSeatsRoutes($method, $segments, $input) {
         $holdToken = 'HOLD-' . bin2hex(random_bytes(16));
         $expiresAt = date('Y-m-d H:i:s', time() + 600); // 10 minutes
 
+        $delHold = $pdo->prepare("DELETE FROM seat_holds WHERE bus_id = ? AND travel_date = ? AND seat_no = ?");
         $insertHold = $pdo->prepare("
             INSERT INTO seat_holds (bus_id, travel_date, seat_no, hold_token, expires_at)
             VALUES (?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE hold_token = VALUES(hold_token), expires_at = VALUES(expires_at)
         ");
 
         foreach ($seats as $seat) {
             try {
+                $delHold->execute([$busId, $travelDate, $seat]);
                 $insertHold->execute([$busId, $travelDate, $seat, $holdToken, $expiresAt]);
             } catch (Exception $e) {
-                // If SQLite or duplicate error
+                // Ignore duplicate hold
             }
         }
 

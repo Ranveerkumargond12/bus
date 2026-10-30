@@ -25,6 +25,10 @@ export function SeatSelectionPage() {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Stop-wise Boarding & Dropping Selection
+  const [selectedBoardingStop, setSelectedBoardingStop] = useState(fromLoc);
+  const [selectedDroppingStop, setSelectedDroppingStop] = useState(toLoc);
+
   // Promo Code State
   const [promoCode, setPromoCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0);
@@ -36,14 +40,20 @@ export function SeatSelectionPage() {
       setLoading(true);
       try {
         // Fetch Bus
+        let loadedBus = null;
         const busRes = await api.buses.getById(busId);
         if (busRes && busRes.bus) {
-          setBus(busRes.bus);
+          loadedBus = busRes.bus;
         } else {
           // Fallback if returned directly
           const allBuses = await api.buses.search();
-          const found = (Array.isArray(allBuses) ? allBuses : []).find(b => String(b.id) === String(busId));
-          if (found) setBus(found);
+          loadedBus = (Array.isArray(allBuses) ? allBuses : []).find(b => String(b.id) === String(busId)) || null;
+        }
+
+        if (loadedBus) {
+          setBus(loadedBus);
+          setSelectedBoardingStop(searchParams.get('from') || loadedBus.source || fromLoc);
+          setSelectedDroppingStop(searchParams.get('to') || loadedBus.destination || toLoc);
         }
 
         // Fetch Booked Seats
@@ -61,7 +71,53 @@ export function SeatSelectionPage() {
     loadSeatData();
   }, [busId, travelDate]);
 
-  const seatPrice = bus ? Number(bus.fare) || 850 : 850;
+  // Build ordered route stops list: [Origin, ...Intermediate Stops, Final Destination]
+  const allRouteStops = React.useMemo(() => {
+    if (!bus) return [];
+    const list = [
+      {
+        stop_name: bus.source,
+        fare: 0,
+        distance: '0 KM',
+        arrival_time: bus.departure_time || ''
+      }
+    ];
+    const midStops = Array.isArray(bus.route_stops) ? bus.route_stops : [];
+    midStops.forEach(st => {
+      if (st && st.stop_name) {
+        list.push({
+          stop_name: st.stop_name,
+          fare: Number(st.fare) || 0,
+          distance: st.distance || '',
+          arrival_time: st.arrival_time || ''
+        });
+      }
+    });
+    list.push({
+      stop_name: bus.destination,
+      fare: Number(bus.fare) || 850,
+      distance: bus.distance || '',
+      arrival_time: bus.arrival_time || ''
+    });
+    return list;
+  }, [bus]);
+
+  // Compute dynamic stop-to-stop fare & distance
+  const { seatPrice, stopDistance } = React.useMemo(() => {
+    const defaultPrice = bus ? Number(bus.fare) || 850 : 850;
+    const defaultDist = bus?.distance || `${selectedBoardingStop} to ${selectedDroppingStop}`;
+    if (allRouteStops.length <= 2) {
+      return { seatPrice: defaultPrice, stopDistance: defaultDist };
+    }
+    const fromObj = allRouteStops.find(s => s.stop_name.toLowerCase() === (selectedBoardingStop || '').toLowerCase()) || allRouteStops[0];
+    const toObj = allRouteStops.find(s => s.stop_name.toLowerCase() === (selectedDroppingStop || '').toLowerCase()) || allRouteStops[allRouteStops.length - 1];
+
+    const diffFare = Number(toObj.fare) - Number(fromObj.fare);
+    const computedPrice = diffFare > 0 ? diffFare : (Number(toObj.fare) > 0 ? Number(toObj.fare) : defaultPrice);
+    const computedDist = toObj.distance ? `${selectedBoardingStop} ➔ ${selectedDroppingStop} (${toObj.distance})` : `${selectedBoardingStop} ➔ ${selectedDroppingStop}`;
+    return { seatPrice: computedPrice, stopDistance: computedDist };
+  }, [bus, allRouteStops, selectedBoardingStop, selectedDroppingStop]);
+
   const busName = bus ? bus.bus_name : 'Express Bus';
 
   const toggleSeat = (seatId) => {
@@ -138,8 +194,9 @@ export function SeatSelectionPage() {
       baseFare: rawBaseFare,
       discount: appliedDiscount,
       promoCode: appliedDiscount > 0 ? promoCode : '',
-      from: fromLoc,
-      to: toLoc,
+      from: selectedBoardingStop || fromLoc,
+      to: selectedDroppingStop || toLoc,
+      stopDistance: stopDistance,
       travelDate: travelDate
     };
 
@@ -148,8 +205,8 @@ export function SeatSelectionPage() {
 
     const params = new URLSearchParams({
       busId: busId,
-      from: fromLoc,
-      to: toLoc,
+      from: selectedBoardingStop || fromLoc,
+      to: selectedDroppingStop || toLoc,
       date: travelDate
     });
     navigate(`/passenger?${params.toString()}`);
@@ -157,15 +214,16 @@ export function SeatSelectionPage() {
 
   return (
     <div className="seat-selection-page" style={{ maxWidth: '1100px', margin: '0 auto', padding: '30px 20px' }}>
-      {/* Route Header with Interactive Date Picker */}
+      {/* Route Header with Interactive Date Picker & Stop-wise Fare Selector */}
       <div style={{ background: '#ffffff', borderRadius: '12px', padding: '20px 25px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', marginBottom: '25px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
           <div>
             <h2 style={{ margin: '0 0 5px 0', color: '#1c2430' }}>
-              {fromLoc} ➔ {toLoc}
+              {selectedBoardingStop || fromLoc} ➔ {selectedDroppingStop || toLoc}
             </h2>
             <div style={{ color: '#64748b', fontSize: '0.95rem' }}>
               Bus: <strong style={{ color: '#008cff' }}>{busName}</strong> | Seat Fare: <strong style={{ color: '#10b981' }}>₹{seatPrice}</strong>
+              {stopDistance && <span> | 🛣️ <strong>{stopDistance}</strong></span>}
             </div>
           </div>
 
@@ -190,6 +248,50 @@ export function SeatSelectionPage() {
             />
           </div>
         </div>
+
+        {/* Stop-wise Boarding & Dropping Selector (if bus has stops) */}
+        {allRouteStops.length > 2 && (
+          <div style={{ marginTop: '18px', paddingTop: '16px', borderTop: '1px dashed #cbd5e1', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', alignItems: 'center' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#0369a1', marginBottom: '5px' }}>
+                🚏 Select Boarding Stop (Kahan se baithenge)
+              </label>
+              <select
+                value={selectedBoardingStop}
+                onChange={(e) => setSelectedBoardingStop(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #008cff', fontWeight: 'bold', color: '#1e293b', background: '#f8fafc' }}
+              >
+                {allRouteStops.slice(0, -1).map((st, i) => (
+                  <option key={i} value={st.stop_name}>
+                    📍 {st.stop_name} {st.arrival_time ? `(${st.arrival_time})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#15803d', marginBottom: '5px' }}>
+                🏁 Select Dropping Stop (Kahan utrenge - Stop Price)
+              </label>
+              <select
+                value={selectedDroppingStop}
+                onChange={(e) => setSelectedDroppingStop(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #10b981', fontWeight: 'bold', color: '#1e293b', background: '#f0fdf4' }}
+              >
+                {allRouteStops.slice(1).map((st, i) => (
+                  <option key={i} value={st.stop_name}>
+                    🏁 {st.stop_name} — ₹{st.fare} {st.distance ? `(${st.distance})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ background: '#ecfdf5', padding: '10px 14px', borderRadius: '8px', border: '1px solid #a7f3d0', textAlign: 'center' }}>
+              <div style={{ fontSize: '11px', color: '#047857', fontWeight: 'bold' }}>Selected Stop Ticket Price</div>
+              <div style={{ fontSize: '18px', fontWeight: '800', color: '#059669' }}>₹{seatPrice} / seat</div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Main Grid: Layout + Summary */}

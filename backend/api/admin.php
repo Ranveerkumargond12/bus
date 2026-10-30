@@ -58,7 +58,7 @@ function handleAdminRoutes($method, $segments, $input) {
 
     // GET /api/admin/users
     if ($method === 'GET' && $seg1 === 'users') {
-        $stmt = $pdo->query("SELECT id, name, email, phone, role, wallet_balance, created_at FROM users ORDER BY created_at DESC");
+        $stmt = $pdo->query("SELECT id, name, email, phone, role, created_at FROM users ORDER BY created_at DESC");
         sendResponse($stmt->fetchAll());
     }
 
