@@ -1,0 +1,85 @@
+/* ==========================================
+   TravelGo - Modern Search Cards & Light Theme (RedBus + MMT Hybrid)
+   ========================================== */
+
+:root {
+  --bg-dark: #f2f5f8;
+  --bg-card: #ffffff;
+  --accent-blue: #008cff;
+  --accent-cyan: #0052cc;
+  --accent-pink: #d84e55;
+  --text-main: #1c2430;
+  --text-sub: #606f7b;
+  --border-color: #e0e6ed;
+}
+
+.search-header {
+  background: #ffffff;
+  color: #1c2430;
+  padding: 16px 8%;
+  border-bottom: 2px solid var(--border-color);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.search-page-container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 30px;
+}
+
+.filters-sidebar {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 140, 255, 0.08);
+  border: 1px solid var(--border-color);
+  height: fit-content;
+}
+
+/* Elevated Bus Cards */
+.bus-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.bus-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 140, 255, 0.12);
+  border-color: var(--accent-blue);
+}
+
+.bus-info h3 {
+  font-size: 1.2rem;
+  color: #1c2430;
+  font-weight: 800;
+}
+
+.btn-select-seats {
+  background: linear-gradient(135deg, #d84e55, #e53935);
+  color: #ffffff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 4px 12px rgba(216, 78, 85, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-select-seats:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(216, 78, 85, 0.5);
+}

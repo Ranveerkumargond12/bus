@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <head>
+  <!-- Baaki ke head elements (title, meta, etc.) -->
+
+  <!-- Google Translate Top Banner Force Hide -->
+  <style type="text/css">
+    iframe.goog-te-banner-frame,
+    .goog-te-banner-frame,
+    .goog-te-banner,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    div.skiptranslate,
+    #google_translate_element .goog-te-gadget-simple {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      width: 0 !important;
+    }
+
+    body {
+      top: 0px !important;
+      position: static !important;
+      min-height: 100% !important;
+    }
+
+    .goog-text-highlight {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+  </style>
+</head>
+  <!-- Google Translate ki speed badhane ke liye preconnect -->
+  <link rel="preconnect" href="https://translate.googleapis.com" />
+  <link rel="preconnect" href="https://translate.google.com" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TravelGo - Passenger Details</title>
+  <link rel="stylesheet" href="css/passenger.css">
+</head>
+<body>
+
+  <div class="page-container">
+    <div class="glass-card">
+      
+      <!-- Header -->
+      <div class="card-header">
+        <a href="seat-selection.html" class="back-link">← Back to Seat Selection</a>
+        <h2>Passenger Details</h2>
+      </div>
+
+      <!-- Booking Summary Bar -->
+      <div class="summary-bar">
+        <div class="summary-item">
+          <span>Selected Seats:</span>
+          <strong id="displaySeats">Loading...</strong>
+        </div>
+        <div class="summary-item">
+          <span>Total Fare:</span>
+          <strong id="displayFare" class="price-text">₹0</strong>
+        </div>
+      </div>
+
+      <!-- Main Form -->
+      <form id="passengerForm">
+        
+        <!-- Dynamic Cards Container -->
+        <div id="passengerCardsContainer">
+          <!-- JS isme automatically seat ke hisab se cards generate karega -->
+        </div>
+
+        <!-- Add-ons & Extras Section -->
+        <div class="addons-section" style="margin: 25px 0; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; background: rgba(255, 255, 255, 0.05);">
+          <h3 style="margin-top: 0; margin-bottom: 15px; color: #333; font-size: 1.1rem;">🧳 Add-ons & Extras</h3>
+          
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Extra Baggage -->
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.95rem; color: #444;">
+              <input type="checkbox" id="addBaggage" value="150" style="width: 18px; height: 18px; cursor: pointer;">
+              <span>Extra Baggage (+15kg) - <strong>₹150</strong></span>
+            </label>
+
+            <!-- Travel Insurance -->
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.95rem; color: #444;">
+              <input type="checkbox" id="addInsurance" value="49" style="width: 18px; height: 18px; cursor: pointer;">
+              <span>Travel Insurance (Secure your trip) - <strong>₹49</strong></span>
+            </label>
+
+            <!-- Meal Box -->
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.95rem; color: #444;">
+              <input type="checkbox" id="addMeal" value="99" style="width: 18px; height: 18px; cursor: pointer;">
+              <span>Snacks & Beverage Box - <strong>₹99</strong></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="contact-section">
+          <h3>Contact Details</h3>
+          <p class="section-desc">Ticket details and updates will be sent to this contact.</p>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="contactEmail">Email Address</label>
+              <input type="email" id="contactEmail" class="glass-input" placeholder="example@gmail.com" required>
+            </div>
+            <div class="form-group">
+              <label for="contactPhone">Phone Number</label>
+              <input type="tel" id="contactPhone" class="glass-input" placeholder="+91 98765 43210" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <button type="submit" class="btn-proceed">Proceed to Payment →</button>
+
+      </form>
+
+    </div>
+  </div>
+<script src="js/auth-check.js"></script>
+  <script src="js/passenger.js"></script>
+  <!-- Google Translate Fast Background Engine -->
+<div id="google_translate_element" style="display:none;"></div>
+
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,hi,bn,mr,te,ta,gu,ur',
+      autoDisplay: false,
+      multilanguagePage: true
+    }, 'google_translate_element');
+  }
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

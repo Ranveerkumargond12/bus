@@ -1,0 +1,260 @@
+/* ==========================================
+   Passenger Details - Light Theme (RedBus + MMT Hybrid)
+   ========================================== */
+
+:root {
+  --bg-dark: #f2f5f8;
+  --card-bg: #ffffff;
+  --accent-blue: #008cff;
+  --accent-cyan: #0052cc;
+  --accent-pink: #d84e55;
+  --text-main: #1c2430;
+  --text-sub: #606f7b;
+  --border-color: #e0e6ed;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 15px;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 700px;
+}
+
+/* Light Card Outer Box */
+.glass-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 140, 255, 0.08);
+  padding: 30px;
+}
+
+/* Header & Back Link */
+.card-header {
+  margin-bottom: 20px;
+}
+
+.back-link {
+  color: var(--accent-blue);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-block;
+  margin-bottom: 8px;
+  transition: opacity 0.2s;
+}
+
+.back-link:hover {
+  opacity: 0.8;
+}
+
+.card-header h2 {
+  font-size: 1.6rem;
+  color: var(--text-main);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+/* Summary Banner */
+.summary-bar {
+  background: rgba(0, 140, 255, 0.05);
+  border: 1px dashed var(--accent-blue);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.summary-item span {
+  color: var(--text-sub);
+  font-size: 0.9rem;
+  margin-right: 6px;
+  font-weight: 600;
+}
+
+.summary-item strong {
+  color: var(--text-main);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.summary-item .price-text {
+  color: var(--accent-pink);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+/* Individual Passenger Card */
+.passenger-card {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.passenger-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+
+/* Form Layout Grid */
+.form-grid {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 160px;
+}
+
+.form-group.sm {
+  flex: 0.5;
+  min-width: 90px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+/* High Contrast Inputs */
+.glass-input {
+  width: 100%;
+  padding: 11px 14px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.glass-input::placeholder {
+  color: #a0aec0;
+}
+
+.glass-input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 8px rgba(0, 140, 255, 0.2);
+}
+
+/* Interactive Gender Selector Pills */
+.gender-selector {
+  display: flex;
+  gap: 8px;
+}
+
+.gender-pill {
+  flex: 1;
+  cursor: pointer;
+}
+
+.gender-pill input {
+  display: none;
+}
+
+.gender-pill span {
+  display: block;
+  text-align: center;
+  padding: 10px 0;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.gender-pill input:checked + span {
+  background: rgba(0, 140, 255, 0.1);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  font-weight: 800;
+}
+
+/* Contact Section */
+.contact-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  margin-top: 10px;
+  margin-bottom: 25px;
+}
+
+.contact-section h3 {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  font-weight: 800;
+}
+
+.section-desc {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+/* RedBus Red Proceed Button */
+.btn-proceed {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #d84e55, #e53935);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(216, 78, 85, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-proceed:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(216, 78, 85, 0.5);
+}
+/* Input Text Color Fix */
+.glass-input, 
+input[type="text"], 
+input[type="number"], 
+input[type="email"], 
+select {
+  color: #1c2430 !important;
+  font-weight: 600 !important;
+}
+
+/* Placeholder Text Color Fix */
+.glass-input::placeholder,
+input::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}

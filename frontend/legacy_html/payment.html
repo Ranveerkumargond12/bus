@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <head>
+  <!-- Google Translate Top Banner Force Hide -->
+  <style type="text/css">
+    iframe.goog-te-banner-frame,
+    .goog-te-banner-frame,
+    .goog-te-banner,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    div.skiptranslate,
+    #google_translate_element .goog-te-gadget-simple {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      width: 0 !important;
+    }
+
+    body {
+      top: 0px !important;
+      position: static !important;
+      min-height: 100% !important;
+    }
+
+    .goog-text-highlight {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+  </style>
+</head>
+  <!-- Google Translate ki speed badhane ke liye preconnect -->
+  <link rel="preconnect" href="https://translate.googleapis.com" />
+  <link rel="preconnect" href="https://translate.google.com" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TravelGo - Complete Payment</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/passenger.css">
+  <style>
+    /* Light Theme Base & Variables */
+    :root {
+      --bg-dark: #f2f5f8;
+      --card-bg: #ffffff;
+      --accent-blue: #008cff;
+      --accent-cyan: #0052cc;
+      --accent-pink: #d84e55;
+      --text-main: #1c2430;
+      --text-sub: #606f7b;
+      --border-color: #e0e6ed;
+    }
+
+    /* Payment Option Cards */
+    .payment-options { 
+      margin-top: 15px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+    }
+
+    .payment-method { 
+      background: #f8fafc; 
+      border: 1px solid var(--border-color); 
+      border-radius: 12px; 
+      padding: 14px; 
+      cursor: pointer; 
+      transition: all 0.2s ease;
+    }
+
+    .payment-method.active { 
+      border-color: var(--accent-blue) !important; 
+      background: rgba(0, 140, 255, 0.04) !important; 
+      box-shadow: 0 4px 12px rgba(0, 140, 255, 0.08);
+    }
+
+    .method-header { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      font-weight: 700; 
+      color: var(--text-main) !important; 
+      cursor: pointer; 
+    }
+
+    .method-header i {
+      color: var(--accent-blue) !important;
+    }
+
+    .form-panel { 
+      display: none; 
+      margin-top: 12px; 
+      padding-top: 12px; 
+      border-top: 1px solid var(--border-color); 
+    }
+
+    .form-panel.active { 
+      display: block; 
+    }
+
+    .row-inputs { 
+      display: flex; 
+      gap: 10px; 
+      margin-top: 8px; 
+    }
+
+    /* Form Field Overrides */
+    .glass-input {
+      background: #ffffff !important;
+      border: 1px solid var(--border-color) !important;
+      color: var(--text-main) !important;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 10px 14px;
+      width: 100%;
+      outline: none;
+    }
+
+    .glass-input:focus {
+      border-color: var(--accent-blue) !important;
+      box-shadow: 0 0 0 3px rgba(0, 140, 255, 0.15);
+    }
+    
+    /* Success Modal Light Styling */
+    .modal-overlay { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: rgba(15, 23, 42, 0.6) !important; 
+      backdrop-filter: blur(4px);
+      display: none; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 1000; 
+    }
+
+    .modal-overlay.show { 
+      display: flex !important; 
+    }
+
+    .modal-card { 
+      background: #ffffff !important; 
+      border: 1px solid var(--border-color) !important; 
+      border-radius: 20px !important; 
+      padding: 30px !important; 
+      text-align: center !important; 
+      max-width: 360px !important; 
+      width: 90% !important; 
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .modal-card h3 {
+      color: var(--text-main) !important;
+      font-size: 1.3rem !important;
+      font-weight: 800 !important;
+      margin-top: 8px !important;
+    }
+
+    .modal-card p {
+      color: var(--text-sub) !important;
+      font-size: 0.88rem !important;
+      font-weight: 600 !important;
+    }
+
+    .success-icon { 
+      font-size: 3rem !important; 
+      color: #10b981 !important; 
+      margin-bottom: 8px; 
+    }
+
+    .pnr-box { 
+      background: #f1f5f9 !important; 
+      border: 1px dashed var(--accent-blue) !important;
+      padding: 12px !important; 
+      border-radius: 10px !important; 
+      margin: 18px 0 !important; 
+      font-size: 1.1rem !important; 
+      font-weight: 800 !important; 
+      color: var(--accent-blue) !important; 
+    }
+
+    .done-btn { 
+      width: 100% !important; 
+      padding: 12px !important; 
+      background: linear-gradient(135deg, #d84e55, #e53935) !important; 
+      border: none !important; 
+      color: #ffffff !important; 
+      font-weight: 800 !important; 
+      border-radius: 10px !important; 
+      cursor: pointer !important; 
+      box-shadow: 0 4px 14px rgba(216, 78, 85, 0.3) !important;
+      transition: all 0.2s ease;
+    }
+
+    .done-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(216, 78, 85, 0.45) !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-container">
+    <div class="glass-card">
+      
+      <!-- Header -->
+      <div class="card-header">
+        <a href="passenger.html" class="back-link">← Back to Passengers</a>
+        <h2>Complete Payment</h2>
+      </div>
+
+      <!-- Seat Selection Timer Box Added Here -->
+      <div class="timer-box" style="background: rgba(216, 78, 85, 0.1); padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 15px; color: #d84e55; font-weight: 700;">
+        ⏱️ Time remaining to complete payment: <span id="paymentTimer">10:00</span>
+      </div>
+
+      <!-- Booking Fare Summary -->
+      <div class="summary-bar" style="flex-direction: column; gap: 8px; align-items: stretch;">
+        <div style="display: flex; justify-content: space-between;">
+          <span>Selected Seats:</span>
+          <strong id="summarySeats">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Passengers Count:</span>
+          <strong id="summaryPassengers">0</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Base Ticket Fare:</span>
+          <strong id="display-base-fare">₹0</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>GST & Service Charge:</span>
+          <strong id="display-tax-fare">₹0</strong>
+        </div>
+        <hr style="border-color: rgba(224, 230, 237, 0.8);">
+        <div style="display: flex; justify-content: space-between; font-size: 1.1rem;">
+          <span>Total Payable:</span>
+          <strong id="summaryAmount" class="price-text">₹0</strong>
+        </div>
+      </div>
+
+      <!-- Payment Form -->
+      <form id="paymentForm">
+        <h3 style="margin-top: 15px; font-size: 1rem; color: #1c2430; font-weight: 700;">Choose Payment Method</h3>
+        
+        <div class="payment-options">
+          
+          <!-- UPI Option -->
+          <div class="payment-method active">
+            <label class="method-header">
+              <input type="radio" name="paymentType" value="upi" checked>
+              <i class="fa-solid fa-qrcode" style="color: #008cff;"></i> UPI / Google Pay / PhonePe
+            </label>
+            <div class="form-panel active" id="upiForm">
+              <input type="text" class="glass-input" placeholder="Enter UPI ID (e.g. mobile@upi)">
+            </div>
+          </div>
+
+          <!-- Card Option -->
+          <div class="payment-method">
+            <label class="method-header">
+              <input type="radio" name="paymentType" value="card">
+              <i class="fa-solid fa-credit-card" style="color: #008cff;"></i> Credit / Debit Card
+            </label>
+            <div class="form-panel" id="cardForm">
+              <input type="text" class="glass-input" placeholder="Card Number (16 Digits)">
+              <div class="row-inputs">
+                <input type="text" class="glass-input" placeholder="MM/YY">
+                <input type="password" class="glass-input" placeholder="CVV">
+              </div>
+            </div>
+          </div>
+
+          <!-- Net Banking Option -->
+          <div class="payment-method">
+            <label class="method-header">
+              <input type="radio" name="paymentType" value="netbanking">
+              <i class="fa-solid fa-building-columns" style="color: #008cff;"></i> Net Banking
+            </label>
+            <div class="form-panel" id="netbankingForm">
+              <select class="glass-input" style="background: #ffffff; color: #1c2430;">
+                <option>Select Bank</option>
+                <option>SBI - State Bank of India</option>
+                <option>HDFC Bank</option>
+                <option>ICICI Bank</option>
+                <option>Axis Bank</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Wallet Option (Added) -->
+          <div class="payment-method">
+            <label class="method-header">
+              <input type="radio" name="paymentType" value="wallet">
+              <i class="fa-solid fa-wallet" style="color: #008cff;"></i> SafarSathi Wallet
+            </label>
+            <div class="form-panel" id="walletForm">
+              <p style="font-size: 0.88rem; color: var(--text-sub); margin-bottom: 8px;">
+                Available Balance: <strong id="checkoutWalletBalance" style="color: var(--accent-blue);">₹0</strong>
+              </p>
+              <p style="font-size: 0.8rem; color: #10b981;">Instant payment using your wallet balance.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-proceed" id="payNowBtn" style="margin-top: 20px;">
+          <i class="fa-solid fa-lock"></i> <span id="btn-pay-text">Proceed to Pay</span>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Success Modal Popup -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-card">
+      <i class="fa-solid fa-circle-check success-icon"></i>
+      <h3>Payment Successful!</h3>
+      <p style="margin-top: 5px;">Your ticket has been confirmed.</p>
+      
+      <div class="pnr-box">
+        PNR: <span id="ticketId">SS-000000</span>
+      </div>
+
+      <button type="button" class="done-btn" id="doneBtn">View My Bookings</button>
+    </div>
+  </div>
+
+  <script src="js/auth-check.js"></script>
+  <script src="js/payment.js"></script>
+<!-- Google Translate Fast Background Engine -->
+<div id="google_translate_element" style="display:none;"></div>
+
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,hi,bn,mr,te,ta,gu,ur',
+      autoDisplay: false,
+      multilanguagePage: true
+    }, 'google_translate_element');
+  }
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

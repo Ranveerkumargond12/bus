@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <head>
+  <!-- Baaki ke head elements (title, meta, etc.) -->
+
+  <!-- Google Translate Top Banner Force Hide -->
+  <style type="text/css">
+    iframe.goog-te-banner-frame,
+    .goog-te-banner-frame,
+    .goog-te-banner,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    div.skiptranslate,
+    #google_translate_element .goog-te-gadget-simple {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      width: 0 !important;
+    }
+
+    body {
+      top: 0px !important;
+      position: static !important;
+      min-height: 100% !important;
+    }
+
+    .goog-text-highlight {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+  </style>
+</head>
+  <!-- Google Translate ki speed badhane ke liye preconnect -->
+  <link rel="preconnect" href="https://translate.googleapis.com" />
+  <link rel="preconnect" href="https://translate.google.com" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bus Search Results - SafarSathi</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="index.html" class="logo notranslate">
+        <span class="logo-icon">🚌</span> Safar<span class="logo-accent">Sathi</span>
+      </a>
+     
+    </div>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="my-bookings.html">My Bookings</a></li>
+        <li><a href="offers.html">Offers</a></li>
+      </ul>
+      <a href="login.html" class="btn-login notranslate">Login / Sign Up</a>
+    </div>
+  </nav>
+
+  <!-- Glassmorphic Modify Search Header -->
+  <div class="modify-search-bar">
+    <form class="modify-form" id="searchForm">
+      <div class="mod-group">
+        <label>📍 FROM</label>
+        <input type="text" name="from" id="fromInput" placeholder="Departure City" required>
+      </div>
+      <button type="button" class="btn-swap-sm" id="btn-swap">⇄</button>
+      <div class="mod-group">
+        <label>🚩 TO</label>
+        <input type="text" name="to" id="toInput" placeholder="Destination City" required>
+      </div>
+      <div class="mod-group">
+        <label>📅 DATE</label>
+        <input type="date" id="dateInput" name="date">
+      </div>
+      <div class="mod-group">
+        <label>🚌 BUS TYPE</label>
+        <select>
+          <option>All Types</option>
+          <option>AC Sleeper</option>
+          <option>Non-AC Seater</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-modify-submit">✏️ Modify Search</button>
+    </form>
+  </div>
+
+  <!-- Results Page Layout -->
+  <div class="results-container">
+    
+    <!-- Sidebar Filters -->
+    <aside class="filters-sidebar">
+      <h3 class="filter-title">Filter Results</h3>
+
+      <div class="filter-group">
+        <label class="filter-heading">Bus Type</label>
+        <label class="checkbox-label"><input type="checkbox" checked> AC Sleeper</label>
+        <label class="checkbox-label"><input type="checkbox" checked> Seater / Non-AC</label>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-heading">Max Price: <span id="priceVal">₹3000</span></label>
+        <input type="range" id="priceRange" min="500" max="3000" value="3000" class="price-slider">
+      </div>
+    </aside>
+
+    <!-- Bus Listings Container (Dynamic Render via JS) -->
+    <main class="bus-list" id="busListContainer">
+      <!-- Bus Cards will be injected dynamically by search-results.js -->
+    </main>
+  </div>
+
+  <!-- Central Mock Database & Scripts -->
+  <script src="js/mockData.js"></script>
+  <script src="js/search-results.js"></script>
+  <script src="js/auth-check.js"></script>
+  <!-- Google Translate Fast Background Engine -->
+<div id="google_translate_element" style="display:none;"></div>
+
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,hi,bn,mr,te,ta,gu,ur',
+      autoDisplay: false,
+      multilanguagePage: true
+    }, 'google_translate_element');
+  }
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google Translate Top Banner Force Hide -->
+  <style type="text/css">
+    iframe.goog-te-banner-frame,
+    .goog-te-banner-frame,
+    .goog-te-banner,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    div.skiptranslate,
+    #google_translate_element .goog-te-gadget-simple {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      width: 0 !important;
+    }
+
+    body {
+      top: 0px !important;
+      position: static !important;
+      min-height: 100% !important;
+    }
+
+    .goog-text-highlight {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+  </style>
+
+  <!-- Google Translate ki speed badhane ke liye preconnect -->
+  <link rel="preconnect" href="https://translate.googleapis.com" />
+  <link rel="preconnect" href="https://translate.google.com" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TravelGo - My Bookings</title>
+  <link rel="stylesheet" href="css/my-bookings.css">
+
+  <!-- Leaflet CSS for Live Bus Tracking Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Additional CSS for Tabs, Status Badges & Google Translate Dropdown -->
+  <style>
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    /* Filter Tabs Styling */
+    .filter-tabs {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 5px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 15px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #666;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover {
+      color: #007bff;
+    }
+
+    .tab-btn.active {
+      color: #007bff;
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: #007bff;
+      border-radius: 2px;
+    }
+
+    /* Google Translate Integration */
+    .goog-te-banner-frame.skiptranslate, .goog-te-banner-frame {
+      display: none !important;
+    }
+    body { top: 0px !important; }
+    #google_translate_element select {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      outline: none;
+    }
+    .goog-te-gadget-icon, .goog-te-gadget span { display: none !important; }
+    .goog-te-gadget { font-size: 0px !important; }
+  </style>
+</head>
+<body>
+
+  <div class="page-container">
+    <div class="glass-card">
+      
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="index.html" class="back-link">← Home</a>
+        <h2>My Bookings</h2>
+        
+        <div class="header-actions">
+          <!-- Google Translate Dropdown -->
+          <div id="google_translate_element"></div>
+        </div>
+      </div>
+
+      <!-- Filter Tabs: All, Upcoming, Completed, Cancelled -->
+      <div class="filter-tabs">
+        <button class="tab-btn active" onclick="filterBookings('ALL', this)">All</button>
+        <button class="tab-btn" onclick="filterBookings('UPCOMING', this)">Upcoming</button>
+        <button class="tab-btn" onclick="filterBookings('COMPLETED', this)">Completed</button>
+        <button class="tab-btn" onclick="filterBookings('CANCELLED', this)">Cancelled</button>
+      </div>
+
+      <div id="bookingsList" class="bookings-list">
+        <!-- JS se dynamically booking cards load honge -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Live Bus Tracking Modal -->
+  <div id="trackingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: #1e293b; border-radius: 12px; width: 90%; max-width: 700px; padding: 20px; color: #fff; position: relative;">
+      <button onclick="closeTrackingModal()" style="position: absolute; top: 15px; right: 20px; background: transparent; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
+      <h3 id="trackBusTitle" style="margin-top: 0; color: #38bdf8;">Live Bus Tracking</h3>
+      <p id="trackStatus" style="font-size: 0.9rem; color: #34d399; margin-bottom: 10px;">Status: On Time (Live GPS Active)</p>
+      
+      <!-- Leaflet Map Container -->
+      <div id="map" style="height: 350px; width: 100%; border-radius: 8px; margin-bottom: 15px;"></div>
+      
+      <div style="text-align: right;">
+        <button onclick="closeTrackingModal()" style="padding: 8px 16px; background: #64748b; color: #fff; border: none; border-radius: 6px; cursor: pointer;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review & Rating Modal -->
+  <div id="reviewModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: #1e293b; border-radius: 12px; width: 90%; max-width: 450px; padding: 25px; color: #fff; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+      <button onclick="closeReviewModal()" style="position: absolute; top: 15px; right: 20px; background: transparent; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
+      <h3 style="margin-top: 0; color: #38bdf8; margin-bottom: 15px;">Rate Your Journey</h3>
+      
+      <form id="reviewForm" onsubmit="submitReview(event)">
+        <input type="hidden" id="reviewBookingId">
+        
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px;">Select Rating (1 to 5 Stars)</label>
+          <select id="starRating" required style="width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; outline: none;">
+            <option value="5" style="background: #1e293b;">⭐⭐⭐⭐⭐ (5 - Excellent)</option>
+            <option value="4" style="background: #1e293b;">⭐⭐⭐⭐ (4 - Good)</option>
+            <option value="3" style="background: #1e293b;">⭐⭐⭐ (3 - Average)</option>
+            <option value="2" style="background: #1e293b;">⭐⭐ (2 - Poor)</option>
+            <option value="1" style="background: #1e293b;">⭐ (1 - Terrible)</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px;">Your Feedback / Review</label>
+          <textarea id="reviewComment" rows="3" placeholder="Share your experience about bus cleanliness, staff, punctuality..." required style="width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; outline: none; resize: none;"></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" onclick="closeReviewModal()" style="padding: 8px 16px; background: #64748b; color: #fff; border: none; border-radius: 6px; cursor: pointer;">Cancel</button>
+          <button type="submit" style="padding: 8px 16px; background: #0284c7; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Submit Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PDF Generator & Leaflet Map Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script src="js/auth-check.js"></script>
+  <script src="js/my-bookings.js"></script>
+
+  <!-- Google Translate Fast Background Engine -->
+  <div id="google_translate_element" style="display:none;"></div>
+
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi,bn,mr,te,ta,gu,ur',
+        autoDisplay: false,
+        multilanguagePage: true
+      }, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

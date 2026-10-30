@@ -1,0 +1,352 @@
+/* ==========================================
+   TravelGo - Modern Payment Page Light Theme (RedBus + MMT Hybrid)
+   ========================================== */
+
+:root {
+  --bg-dark: #f2f5f8;
+  --card-bg: #ffffff;
+  --accent-blue: #008cff;
+  --accent-cyan: #0052cc;
+  --accent-pink: #d84e55;
+  --text-main: #1c2430;
+  --text-sub: #606f7b;
+  --input-bg: #f8fafc;
+  --border-color: #e0e6ed;
+  --border-glow: #008cff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 520px;
+}
+
+/* Light Elevated Payment Card Container */
+.payment-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(0, 140, 255, 0.12);
+}
+
+.payment-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.payment-header h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.payment-header p {
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* Summary Box */
+.summary-box {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-color);
+  color: var(--text-main);
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.summary-row .total-amount {
+  color: var(--accent-pink);
+  font-weight: 800;
+}
+
+/* Payment Methods Options Styling */
+.payment-methods-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.payment-method {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-method:hover {
+  border-color: var(--accent-blue);
+  background: #ffffff;
+}
+
+.payment-method.active {
+  border-color: var(--accent-blue);
+  background: rgba(0, 140, 255, 0.06);
+}
+
+.method-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.method-header input[type="radio"] {
+  accent-color: var(--accent-blue);
+  cursor: pointer;
+}
+
+.form-panel {
+  display: none;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.form-panel.active {
+  display: block;
+}
+
+.input-field {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--text-main);
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-field::placeholder {
+  color: #a0aec0;
+}
+
+.input-field:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 8px rgba(0, 140, 255, 0.15);
+}
+
+.row-inputs {
+  display: flex;
+  gap: 8px;
+}
+
+/* RedBus Red Pay Button */
+.pay-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #d84e55, #e53935);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(216, 78, 85, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(216, 78, 85, 0.45);
+}
+
+/* Toast Notification Styling */
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+.custom-toast {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid var(--accent-blue);
+  box-shadow: 0 10px 30px rgba(0, 140, 255, 0.2);
+  padding: 16px 20px;
+  border-radius: 16px;
+  color: var(--text-main);
+  transform: translateY(-50px) scale(0.9);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.custom-toast.show {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.toast-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(0, 140, 255, 0.1);
+  border: 1px solid var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-blue);
+  font-size: 1.2rem;
+}
+
+.toast-content h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--accent-blue);
+}
+
+.toast-content p {
+  margin: 3px 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+/* Success Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 36, 48, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+}
+
+.modal-overlay.show .modal-card {
+  transform: scale(1);
+}
+
+.modal-card h3 {
+  color: var(--text-main);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.modal-card p {
+  color: var(--text-sub);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.success-icon {
+  font-size: 3.5rem;
+  color: #10b981;
+  margin-bottom: 15px;
+}
+
+.pnr-box {
+  background: rgba(0, 140, 255, 0.08);
+  border: 2px dashed var(--accent-blue);
+  padding: 12px;
+  border-radius: 10px;
+  margin: 18px 0;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--accent-blue);
+  letter-spacing: 1px;
+}
+
+.done-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #008cff, #0052cc);
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 800;
+  color: #ffffff;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(0, 140, 255, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.done-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 140, 255, 0.4);
+}

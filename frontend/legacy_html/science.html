@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafarSathi Science</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background-color: #f8f9fa !important;
+      color: #333333 !important;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .science-hero {
+      background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      color: #ffffff;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .science-hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: #ffffff !important;
+    }
+    .science-hero p {
+      font-size: 1.2rem;
+      color: #00d2ff !important;
+    }
+    .science-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .science-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 30px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-left: 5px solid #00d2ff;
+    }
+    .science-card h2 {
+      color: #1e3c72 !important;
+      margin-top: 0;
+    }
+    .science-card p {
+      color: #555555 !important;
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="index.html" class="logo notranslate">
+        <span class="logo-icon">🚌</span> Safar<span class="logo-accent">Sathi</span>
+      </a>
+    </div>
+    <div class="nav-right">
+      <a href="index.html" style="color: #007bff; font-weight: bold; text-decoration: none;">← Back to Home</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="science-hero">
+    <h1>SafarSathi Science</h1>
+    <p>How Data Science & AI Power Our Booking Engine</p>
+  </header>
+
+  <!-- Content Section -->
+  <main class="science-container">
+    <div class="grid-2">
+      <div class="science-card">
+        <h2>⚡ Dynamic Route Optimization</h2>
+        <p>Our algorithms analyze live traffic, weather data, and highway conditions to predict accurate Arrival & Departure times (ETA) for your bus journeys.</p>
+      </div>
+
+      <div class="science-card">
+        <h2>📊 Smart Seat Locking Engine</h2>
+        <p>Our real-time concurrency engine prevents double bookings when thousands of users try to reserve seats on popular routes at the exact same second.</p>
+      </div>
+    </div>
+
+    <div class="science-card">
+      <h2>🤖 Predictive Fare Analytics</h2>
+      <p>We use Machine Learning models to analyze historical travel trends, helping bus operators offer best discounts and fair ticket pricing during festival seasons.</p>
+    </div>
+  </main>
+
+</body>
+</html>

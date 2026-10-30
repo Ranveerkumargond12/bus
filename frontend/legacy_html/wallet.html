@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My SafarSathi Wallet</title>
+    <style>
+        :root {
+            --bg-dark: #f0f4f8;
+            --card-bg: #ffffff;
+            --accent-blue: #008cff;
+            --accent-blue-hover: #0077d4;
+            --text-main: #1c2430;
+            --text-sub: #606f7b;
+            --border-color: #e2e8f0;
+            --success-green: #10b981;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg-dark); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .wallet-container { 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); 
+            width: 100%; 
+            max-width: 450px; 
+            border: 1px solid var(--border-color);
+        }
+
+        .wallet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .wallet-header h2 {
+            color: var(--text-main);
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .badge {
+            background: rgba(0, 140, 255, 0.1);
+            color: var(--accent-blue);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .balance-box {
+            background: linear-gradient(135deg, #008cff 0%, #0056b3 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0, 140, 255, 0.25);
+        }
+
+        .balance-label {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+
+        .balance-amount { 
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            margin-top: 5px; 
+            letter-spacing: -1px;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-section label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .quick-amounts {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .quick-btn {
+            flex: 1;
+            padding: 8px;
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #e2e8f0;
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        input[type="number"] { 
+            width: 100%; 
+            padding: 12px 14px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-size: 1rem; 
+            outline: none; 
+            font-weight: 600;
+            color: var(--text-main);
+            background: #fafbfc;
+            transition: all 0.2s ease;
+        }
+
+        input[type="number"]:focus { 
+            border-color: var(--accent-blue); 
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(0, 140, 255, 0.15); 
+        }
+
+        .btn-add { 
+            width: 100%; 
+            padding: 12px; 
+            background: var(--accent-blue); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            transition: background 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 12px rgba(0, 140, 255, 0.2);
+        }
+
+        .btn-add:hover { 
+            background: var(--accent-blue-hover); 
+        }
+
+        .history-section {
+            margin-top: 25px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        .history-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+        }
+
+        .transaction-list {
+            max-height: 120px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            border: 1px solid #edf2f7;
+        }
+
+        .tx-info span {
+            display: block;
+        }
+
+        .tx-title {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .tx-date {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+        }
+
+        .tx-amount {
+            font-weight: 700;
+            color: var(--success-green);
+        }
+
+        .footer-nav {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link { 
+            color: var(--text-sub); 
+            text-decoration: none; 
+            font-size: 0.85rem; 
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover { 
+            color: var(--accent-blue); 
+        }
+
+        /* Generic Modal / Popup Styling (Payment & Alerts) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-sub);
+        }
+
+        /* Payment Tabs */
+        .pay-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .pay-tab {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background: transparent;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .pay-tab.active {
+            background: white;
+            color: var(--accent-blue);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .pay-content {
+            display: none;
+        }
+
+        .pay-content.active {
+            display: block;
+        }
+
+        /* QR Code Styling */
+        .qr-box {
+            text-align: center;
+            padding: 10px;
+            background: #f8fafc;
+            border: 1px dashed var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .qr-placeholder {
+            width: 140px;
+            height: 140px;
+            background: #ffffff;
+            margin: 0 auto 8px auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .qr-placeholder img {
+            width: 110px;
+            height: 110px;
+        }
+
+        .upi-apps {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+
+        .gateway-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .gateway-input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .pay-now-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--success-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .pay-now-btn:hover {
+            background: #059669;
+        }
+
+        /* Custom Alert Dialog specific styles */
+        .alert-card {
+            text-align: center;
+            max-width: 320px;
+            padding: 30px 20px;
+        }
+
+        .alert-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .alert-heading {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .alert-text {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 20px;
+        }
+
+        .alert-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .alert-btn:hover {
+            background: var(--accent-blue-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wallet-container">
+        <div class="wallet-header">
+            <h2>SafarSathi Wallet</h2>
+            <span class="badge">SECURED</span>
+        </div>
+        
+        <div class="balance-box">
+            <div class="balance-label">Available Balance</div>
+            <div class="balance-amount" id="balanceDisplay">₹0</div>
+        </div>
+
+        <div class="input-section">
+            <label for="addAmount">Add Funds to Wallet</label>
+            <div class="quick-amounts">
+                <button type="button" class="quick-btn" onclick="setAmount(100)">+₹100</button>
+                <button type="button" class="quick-btn" onclick="setAmount(500)">+₹500</button>
+                <button type="button" class="quick-btn" onclick="setAmount(1000)">+₹1000</button>
+            </div>
+            <input type="number" id="addAmount" placeholder="Enter custom amount" min="1">
+        </div>
+
+        <button class="btn-add" onclick="openPaymentGateway()">Proceed to Add Money</button>
+
+        <div class="history-section">
+            <div class="history-title">Recent Transactions</div>
+            <div class="transaction-list" id="transactionList"></div>
+        </div>
+
+        <div class="footer-nav">
+            <a href="index.html" class="back-link">← Back to Home Page</a>
+        </div>
+    </div>
+
+    <!-- Payment Gateway Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-card">
+            <div class="modal-title">
+                <span>Select Payment Method</span>
+                <button class="close-modal" onclick="closePaymentGateway()">×</button>
+            </div>
+
+            <div class="pay-tabs">
+                <button class="pay-tab active" onclick="switchTab('qr')">📷 QR Code</button>
+                <button class="pay-tab" onclick="switchTab('upi')">⚡ UPI ID</button>
+                <button class="pay-tab" onclick="switchTab('card')">💳 Card</button>
+            </div>
+
+            <div class="pay-content active" id="tab-qr">
+                <div class="qr-box">
+                    <div class="qr-placeholder">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=upi://pay?pa=safarsathi@upi&pn=SafarSathi" alt="Payment QR">
+                    </div>
+                    <div class="upi-apps">Scan with GPay, PhonePe, Paytm & others</div>
+                </div>
+                <button class="pay-now-btn" onclick="completePayment('QR Code Payment')">I've Paid / Simulate Success</button>
+            </div>
+
+            <div class="pay-content" id="tab-upi">
+                <input type="text" class="gateway-input" placeholder="Enter UPI ID (e.g. username@oksbi)" id="upiInput">
+                <button class="pay-now-btn" onclick="completePayment('UPI App')">Verify & Pay</button>
+            </div>
+
+            <div class="pay-content" id="tab-card">
+                <input type="text" class="gateway-input" placeholder="Card Number (4242 4242...)" maxlength="16">
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" class="gateway-input" placeholder="MM/YY" maxlength="5">
+                    <input type="password" class="gateway-input" placeholder="CVV" maxlength="3">
+                </div>
+                <button class="pay-now-btn" onclick="completePayment('Debit/Credit Card')">Pay Securely</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal (Replaces browser alert) -->
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal-card alert-card">
+            <div class="alert-icon" id="alertIcon">🎉</div>
+            <div class="alert-heading" id="alertTitle">Success</div>
+            <div class="alert-text" id="alertMessage">Message goes here</div>
+            <button class="alert-btn" onclick="closeAlertModal()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        let user = JSON.parse(localStorage.getItem('safarsathi_user') || localStorage.getItem('travelgo_user'));
+        
+        if (!user) {
+            user = { wallet_balance: 150, transactions: [{title: "Sign-up Bonus", amount: 150, date: "Today"}] };
+            localStorage.setItem('safarsathi_user', JSON.stringify(user));
+        } else {
+            if (user.wallet_balance === undefined) user.wallet_balance = 150;
+            if (!user.transactions) user.transactions = [{title: "Welcome Bonus", amount: 150, date: "Initial"}];
+        }
+
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const transactionList = document.getElementById('transactionList');
+        let currentAddAmount = 0;
+
+        function updateDisplay() {
+            balanceDisplay.innerText = `₹${user.wallet_balance}`;
+            
+            transactionList.innerHTML = '';
+            user.transactions.slice().reverse().forEach(tx => {
+                transactionList.innerHTML += `
+                    <div class="transaction-item">
+                        <div class="tx-info">
+                            <span class="tx-title">${tx.title}</span>
+                            <span class="tx-date">${tx.date}</span>
+                        </div>
+                        <span class="tx-amount">+₹${tx.amount}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function setAmount(val) {
+            document.getElementById('addAmount').value = val;
+        }
+
+        // Custom Popup Alert function
+        function showAlert(title, message, icon = "🎉") {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMessage').innerText = message;
+            document.getElementById('alertIcon').innerText = icon;
+            document.getElementById('alertModal').classList.add('active');
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alertModal').classList.remove('active');
+        }
+
+        function openPaymentGateway() {
+            const amountInput = document.getElementById('addAmount');
+            currentAddAmount = parseInt(amountInput.value);
+
+            if (currentAddAmount > 0 && !isNaN(currentAddAmount)) {
+                document.getElementById('paymentModal').classList.add('active');
+            } else {
+                showAlert("Invalid Amount", "Please enter or select a valid amount greater than 0 first.", "⚠️");
+            }
+        }
+
+        function closePaymentGateway() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.pay-content').forEach(c => c.classList.remove('active'));
+
+            if(tabName === 'qr') {
+                document.querySelectorAll('.pay-tab')[0].classList.add('active');
+                document.getElementById('tab-qr').classList.add('active');
+            } else if(tabName === 'upi') {
+                document.querySelectorAll('.pay-tab')[1].classList.add('active');
+                document.getElementById('tab-upi').classList.add('active');
+            } else if(tabName === 'card') {
+                document.querySelectorAll('.pay-tab')[2].classList.add('active');
+                document.getElementById('tab-card').classList.add('active');
+            }
+        }
+
+        function completePayment(method) {
+            user.wallet_balance += currentAddAmount;
+            
+            const currentDate = new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+            user.transactions.push({
+                title: `Added via ${method}`,
+                amount: currentAddAmount,
+                date: currentDate
+            });
+
+            localStorage.setItem('safarsathi_user', JSON.stringify(user));
+            localStorage.setItem('travelgo_user', JSON.stringify(user));
+            
+            updateDisplay();
+            closePaymentGateway();
+            
+            showAlert("Payment Successful!", `Successfully added ₹${currentAddAmount} to your wallet via ${method}.`, "💰");
+            document.getElementById('addAmount').value = '';
+        }
+
+        updateDisplay();
+    </script>
+    <script src="payment.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "safarsathi-bus-booking",
+  "version": "2.0.0",
+  "description": "SafarSathi Bus Ticket Booking System (React + PHP 8 + MySQL)",
+  "scripts": {
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "php -S 127.0.0.1:8000 backend/index.php",
+    "build": "npm run build --prefix frontend",
+    "test": "php tests/test_suite.php"
+  },
+  "keywords": [
+    "bus-booking",
+    "react",
+    "php",
+    "mysql",
+    "hostinger"
+  ],
+  "author": "SafarSathi",
+  "license": "ISC"
+}
+

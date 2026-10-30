@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google Translate Top Banner Force Hide -->
+  <style type="text/css">
+    iframe.goog-te-banner-frame,
+    .goog-te-banner-frame,
+    .goog-te-banner,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    div.skiptranslate,
+    #google_translate_element .goog-te-gadget-simple {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      width: 0 !important;
+    }
+
+    body {
+      top: 0px !important;
+      position: static !important;
+      min-height: 100% !important;
+    }
+
+    .goog-text-highlight {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+  </style>
+
+  <link rel="preconnect" href="https://translate.googleapis.com" />
+  <link rel="preconnect" href="https://translate.google.com" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafarSathi - Select Seats</title>
+  <link rel="stylesheet" href="css/seat.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar notranslate">
+    <div class="logo">Safar<span>Sathi</span></div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="booking-container">
+    
+    <!-- LEFT PANEL: BUS SEAT MAP & AMENITIES -->
+    <div class="seat-layout-card">
+      <div class="bus-header">
+        <div class="bus-info">
+          <h3>Select Your Seats</h3>
+          <p id="routeText" class="sub-text">Loading route...</p>
+        </div>
+        <div class="driver-steering" title="Driver Side">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2">
+            <circle cx="12" cy="12" r="9"/>
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 15v6M3 12h6M15 12h6"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- BUS AMENITIES PREVIEW BAR -->
+      <div class="amenities-bar" style="display: flex; gap: 12px; background: #f0fdf4; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #bbf7d0; font-size: 0.85rem; color: #166534; align-items: center;">
+        <span style="font-weight: bold; color: #15803d;">Amenities:</span>
+        <span title="Free High Speed WiFi">📶 WiFi</span>
+        <span title="Charging Point at every seat">🔌 Power Plug</span>
+        <span title="Clean Blanket Provided">🛋️ Blanket</span>
+        <span title="Water Bottle">🍾 Water</span>
+        <span title="Live GPS Tracking">📍 GPS Track</span>
+      </div>
+
+      <!-- SEAT LEGEND (INCLUDING WOMEN SAFETY) -->
+      <div class="seat-legend" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+        <div class="legend-item"><span class="seat-sample available"></span> Available</div>
+        <div class="legend-item"><span class="seat-sample selected"></span> Selected</div>
+        <div class="legend-item"><span class="seat-sample booked"></span> Booked</div>
+        <div class="legend-item"><span class="seat-sample female" style="background-color: #ec4899; border-color: #db2777;"></span> Reserved for Women</div>
+      </div>
+
+      <!-- SEAT GRID (Generated dynamically via JS) -->
+      <div class="bus-grid" id="busGrid"></div>
+    </div>
+
+    <!-- RIGHT PANEL: BOOKING SUMMARY & PROMO CODE -->
+    <div class="booking-summary-card">
+      <h3>Booking Details</h3>
+      <hr class="divider">
+      
+      <div class="summary-details">
+        <div class="summary-row">
+          <span>Selected Seats</span>
+          <span id="selectedSeatsText" class="highlight-text">None</span>
+        </div>
+        <div class="summary-row">
+          <span>Seat Count</span>
+          <span id="seatCountText">0</span>
+        </div>
+        <div class="summary-row">
+          <span>Base Price</span>
+          <span id="basePriceText">₹0</span>
+        </div>
+
+        <!-- PROMO CODE SECTION -->
+        <hr class="divider">
+        <div class="promo-section" style="margin: 10px 0;">
+          <label style="font-size: 0.85rem; font-weight: bold; color: #475569; display: block; margin-bottom: 5px;">Have a Promo Code?</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="promoCodeInput" placeholder="Try SAFAR50 or FIRST100" style="flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; text-transform: uppercase;">
+            <button id="applyPromoBtn" style="padding: 8px 12px; background: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">Apply</button>
+          </div>
+          <p id="promoMessage" style="font-size: 0.8rem; margin: 5px 0 0; display: none;"></p>
+        </div>
+
+        <div class="summary-row discount-row" id="discountRow" style="display: none; color: #16a34a;">
+          <span>Discount Applied</span>
+          <span id="discountText">-₹0</span>
+        </div>
+
+        <hr class="divider">
+        <div class="summary-row total">
+          <span>Total Fare</span>
+          <span id="totalPriceText" class="price-text">₹0</span>
+        </div>
+      </div>
+
+      <button id="checkoutBtn" class="btn-checkout" disabled>Proceed to Checkout</button>
+    </div>
+
+  </main>
+  
+  <script src="js/auth-check.js"></script>
+  <script src="js/seat-selection.js"></script>
+
+  <!-- Google Translate Fast Background Engine -->
+  <div id="google_translate_element" style="display:none;"></div>
+
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi,bn,mr,te,ta,gu,ur',
+        autoDisplay: false,
+        multilanguagePage: true
+      }, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

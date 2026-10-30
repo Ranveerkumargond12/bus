@@ -1,0 +1,106 @@
+/* ==========================================
+   Info / Static Pages - Light Theme (RedBus + MMT Hybrid)
+   ========================================== */
+
+:root {
+  --bg-dark: #f2f5f8;
+  --card-bg: #ffffff;
+  --accent-blue: #008cff;
+  --accent-cyan: #0052cc;
+  --accent-pink: #d84e55;
+  --text-main: #1c2430;
+  --text-sub: #606f7b;
+  --border-color: #e0e6ed;
+}
+
+/* Hero Section with Vibrant MMT Gradient */
+.page-hero {
+  background: linear-gradient(135deg, #008cff 0%, #0052cc 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 60px 20px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 20px rgba(0, 140, 255, 0.2);
+}
+
+.page-hero h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.page-hero p {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  font-weight: 600;
+}
+
+.page-container {
+  max-width: 1000px;
+  margin: 0 auto 60px;
+  padding: 0 20px;
+}
+
+/* Elevated Light Info Cards */
+.info-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 140, 255, 0.08);
+}
+
+.info-card h2 {
+  color: var(--text-main);
+  font-weight: 800;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+/* Grid Layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Pill Badges */
+.badge-tag {
+  background: rgba(0, 140, 255, 0.08);
+  color: var(--accent-blue);
+  border: 1px solid rgba(0, 140, 255, 0.2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: inline-block;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* RedBus Red Primary Buttons */
+.btn-apply {
+  display: inline-block;
+  background: linear-gradient(135deg, #d84e55, #e53935);
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 800;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(216, 78, 85, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-apply:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(216, 78, 85, 0.45);
+}
